@@ -1,39 +1,26 @@
-from typing import Dict
+import asyncio
 
-from ..debug import Level, log
 from ..structs import Auth, User
-from .captcha import captcha_flow
-from .info import get_entitlement, get_user_info
-from .setup import setup_auth, setup_session
-from .token import get_auth_data
+from ..helper import async_setup_auth, async_setup_session, async_get_auth_data, async_get_user_info, \
+    async_get_entitlement
+
+from .captcha import async_captcha_flow
 
 
-def authenticate(user: User, remember=False) -> Auth:
-    log(Level.EXTRA, f"Authenticating {user.username}" +
-        (' with cookies' if remember else ''))
+async def authenticate(user: User) -> Auth:
+    session = await async_setup_session()
 
-    session = setup_session()
+    await async_setup_auth(session)
+    await async_captcha_flow(session, user)
 
-    setup_auth(session)
+    token, cookies = await async_get_auth_data(session)
 
-    captcha_flow(session, user)
+    entitlements_token = await async_get_entitlement(session, token)
 
-    token, cookies = get_auth_data(session)
+    user_id = await async_get_user_info(session, token)
 
-    entitlements_token = get_entitlement(session, token)
+    await session.aclose()
 
-    user_id = get_user_info(session, token)
-
-    session.close()
-
-    auth = Auth(token, entitlements_token, user_id, remember, cookies)
+    auth = Auth(token, entitlements_token, user_id, cookies)
 
     return auth
-
-
-def cookie_token(cookies: Dict[str, str]):
-    log(Level.EXTRA, "Authenticating using cookies")
-    session = setup_session()
-    session.cookies.update(cookies)
-    token, new_cookies = get_auth_data(session)
-    return token, new_cookies

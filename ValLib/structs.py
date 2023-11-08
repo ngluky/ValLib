@@ -2,11 +2,17 @@ from dataclasses import dataclass, field, is_dataclass
 from time import time
 from typing import Dict
 
+class classproperty(property):
+    def __get__(self, cls, owner):
+        return classmethod(self.fget).__get__(None, owner)()
+
 
 @dataclass
 class User:
     username: str
     password: str
+    remember: bool
+
 
     def __hash__(self):
         return hash(self.username)
@@ -32,7 +38,6 @@ class Auth(Token):
     token: Token = field(repr=False)
     entitlements_token: str
     user_id: str
-    remember: bool
     cookies: Dict[str, str]
     access_token: str = field(init=False)
     id_token: str = field(init=False)
@@ -50,4 +55,5 @@ class ExtraAuth(Auth):
     remember: bool = field(init=False)
     cookies: Dict[str, str] = field(init=False)
 
-__all__ = ["User", "Token", "Auth", "ExtraAuth"]
+
+

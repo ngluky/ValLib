@@ -6,12 +6,10 @@ from typing import Any
 
 import jwt
 
-from .debug import Level, log
 from .exceptions import DecodeException
 
 
 def encode_json(data: Any) -> str:
-    log(Level.VERBOSE, aRepr.repr(data))
     str = json.dumps(data).encode("utf-8")
     return base64.b64encode(str).decode("utf-8")
 
@@ -19,12 +17,10 @@ def encode_json(data: Any) -> str:
 def decode_json(data: str) -> Any:
     str = base64.b64decode(data.encode("utf-8"))
     data = json.loads(str)
-    log(Level.VERBOSE, aRepr.repr(data))
     return data
 
 
 def magic_decode(string: str) -> Any:
-    log(Level.VERBOSE, string)
     try:
         return json.loads(string)
     except json.JSONDecodeError:
@@ -50,12 +46,10 @@ def zencode(string_val: bytes) -> bytes:
 def zloads(b64string: str) -> Any:
     inflated_data = zdecode(b64string)
     data = json.loads(inflated_data)
-    log(Level.VERBOSE, aRepr.repr(data))
     return data
 
 
 def zdumps(data: Any) -> str:
-    log(Level.VERBOSE, aRepr.repr(data))
     stringify = json.dumps(data).encode("utf-8")
     return zencode(stringify).decode("utf-8")
 

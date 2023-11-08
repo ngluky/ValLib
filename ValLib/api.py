@@ -3,28 +3,28 @@ from typing import Any
 
 import requests
 from requests import Response
+import httpx
 
 from .parsing import *
-from .auth import make_headers
-from .debug import Level, log
+from .helper import make_headers
 from .structs import Auth, ExtraAuth
 
 
 def get_api(url, auth: Auth) -> Any:
-    log(Level.DEBUG, f"GET {url}", "network")
     r = requests.get(url, headers=make_headers(auth))
     jsonData = json.loads(r.text)
+
     return jsonData
 
 
 def put_api(url, auth: Auth, data) -> Response:
-    log(Level.DEBUG, f"PUT {url}", "network")
+
     req = requests.put(url, headers=make_headers(auth), json=data)
     return req
 
 
 def post_api(url, auth: Auth, data):
-    log(Level.DEBUG, f"POST {url}", "network")
+
     req = requests.post(url, headers=make_headers(auth), json=data)
     return req
 
@@ -83,3 +83,53 @@ def get_shard(region: str) -> str:
     if region in ["latam", "br", "pbe"]:
         return "na"
     return region
+
+
+# async fn
+async def async_get_api(url, auth: Auth):
+    log(Level.DEBUG, f"ASYNC GET {url}", "network")
+    async with httpx.AsyncClient() as client:
+        r = await client.get(url, headers=make_headers(auth))
+        return r.json()
+
+
+async def async_put_api(url, auth: Auth, data) -> httpx.Response:
+    log(Level.DEBUG, f"ASYNC PUT {url}", "network")
+    async with httpx.AsyncClient() as client:
+        r = await client.put(url, headers=make_headers(auth), json=data)
+        return r
+
+
+async def async_post_api(url, auth: Auth, data):
+    log(Level.DEBUG, f"ASYNC POST {url}", "network")
+    async with httpx.AsyncClient() as client:
+        r = await client.post(url, headers=make_headers(auth), json=data)
+        return r
+
+
+async def async_get_preference(auth: Auth) -> Any:
+    pass
+
+
+async def async_set_preference(auth: Auth, data) -> Response:
+    pass
+
+
+async def async_get_load_out(auth: ExtraAuth) -> Any:
+    pass
+
+
+async def async_set_load_out(auth: ExtraAuth, data) -> Response:
+    pass
+
+
+async def async_get_session(loadAuth: ExtraAuth):
+    pass
+
+
+async def async_get_region(auth: Auth) -> str:
+    pass
+
+
+async def async_get_shard(region: str) -> str:
+    pass

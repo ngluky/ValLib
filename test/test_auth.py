@@ -21,8 +21,11 @@ def test_auth():
 
 def test_cookie_auth():
     import ValLib
-    username = getenv("USERNAME", "")
-    password = getenv("PASSWORD", "")
+    username = "kbon_bot"
+    password = "ib@nginput"
     user = ValLib.User(username, password)
     auth = ValLib.authenticate(user, remember=True)
     return ValLib.cookie_token(auth.cookies)
+
+if __name__ == "__main__":
+    test_cookie_auth()

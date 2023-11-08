@@ -1,10 +1,15 @@
+from . import EndPoints
 from .auth import *
 from .exceptions import *
 from .structs import *
+from .version import Version
+from .Weapons import Weapons
 
 __all__ = [
-    "authenticate", "cookie_token",
+    "authenticate",
+    "Version",
     "User", "Auth", "Token",
-    "make_headers",
     "AuthException",
+    "EndPoints",
+    "Weapons"
 ]

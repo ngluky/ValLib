@@ -19,6 +19,7 @@ class WebServerSolver(CaptchaSolver):
         def set_port():
             self._port = next(random_port())
             self._init_server()
+
         t = Thread(target=set_port)
         t.start()
 
@@ -41,7 +42,7 @@ class WebServerSolver(CaptchaSolver):
         if self._timeout <= 0:
             return
 
-        #! Careful race condition, easy solve with t.cancel()
+        # ! Careful race condition, easy solve with t.cancel()
         t = Timer(interval=self._timeout,
                   function=self._server.shutdown)
         t.setDaemon(True)
