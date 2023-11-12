@@ -1,2 +1,0 @@
-class HCaptchaTimeoutException(BaseException):
-    pass

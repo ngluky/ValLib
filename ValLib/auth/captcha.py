@@ -2,16 +2,19 @@ from typing import Any, Dict
 
 from httpx import Client, AsyncClient
 
-from ..captcha import solver
+from ..captcha import ServerCaptcha
 from ..exceptions import AuthException
 from ..structs import User
 from ..version import Version
 
 
-def solve_captcha(data: Dict[str, Any]):
+async def solve_captcha(data: Dict[str, Any]):
     token = data["captcha"]["hcaptcha"]["data"]
     key = data["captcha"]["hcaptcha"]["key"]
-    return solver.token(token, key)
+    print(token, key)
+    server = ServerCaptcha(token, key)
+    await server.server_start()
+    return server.token
 
 
 def get_captcha_token(session: Client):
@@ -33,12 +36,12 @@ def get_captcha_token(session: Client):
     return response_data
 
 
-async def async_get_captcha_token(session: AsyncClient):
+async def async_get_captcha_token(session: AsyncClient, remember=False):
     data = {
         "clientId": "riot-client",
         "language": "",
         "platform": "windows",
-        "remember": False,
+        "remember": remember,
         "riot_identity": {
             "language": "en_GB",
             "state": "auth",
@@ -59,7 +62,7 @@ def get_login_token(session: Client, user: User, code: str):
             "captcha": f"hcaptcha {code}",
             "language": "en_GB",
             "password": user.password,
-            "remember": False,
+            "remember": user.remember,
             "username": user.username
         },
         "type": "auth"
@@ -113,20 +116,20 @@ async def async_login_cookies(session: AsyncClient, login_token: str):
     url = "https://auth.riotgames.com/api/v1/login-token"
     await session.post(url, json=data)
 
-def captcha_flow(session: Client, user: User):
-    captcha_data = get_captcha_token(session)
+# def captcha_flow(session: Client, user: User):
+#     captcha_data = get_captcha_token(session)
 
-    captcha_token = solve_captcha(captcha_data)
+#     captcha_token = solve_captcha(captcha_data)
 
-    login_token = get_login_token(session, user, captcha_token)
+#     login_token = get_login_token(session, user, captcha_token)
 
-    login_cookies(session, login_token)
+#     login_cookies(session, login_token)
 
 
 async def async_captcha_flow(session: AsyncClient, user: User):
-    captcha_data = await async_get_captcha_token(session)
+    captcha_data = await async_get_captcha_token(session, user.remember)
 
-    captcha_token = solve_captcha(captcha_data)
+    captcha_token = await solve_captcha(captcha_data)
 
     login_token = await async_get_login_token(session, user, captcha_token)
 

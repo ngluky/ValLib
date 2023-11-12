@@ -9,10 +9,10 @@ from ..parsing import zloads, zdumps
 
 
 class Setting:
-    def __init__(self, auth: Auth):
+    def __init__(self, auth: Auth, region=None, shard=None):
         self.auth = auth
-        self.region = get_region(self.auth)
-        self.shard = get_shard(self.region)
+        self.region = get_region(self.auth) if region is None else region
+        self.shard = get_shard(self.region) if shard is None else shard
 
     def Fetch_Preference(self):
         url = "https://playerpreferences.riotgames.com/playerPref/v3/getPreference/Ares.PlayerSettings"

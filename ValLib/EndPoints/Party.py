@@ -7,10 +7,10 @@ from ..helper import get_region, get_shard, make_headers
 
 
 class Party:
-    def __init__(self, auth: Auth):
+    def __init__(self, auth: Auth, region=None, shard=None):
         self.auth = auth
-        self.region = get_region(self.auth)
-        self.shard = get_shard(self.region)
+        self.region = get_region(self.auth) if region is None else region
+        self.shard = get_shard(self.region) if shard is None else shard
 
     def Get_Party(self, partyId: UUID):
         url = f"https://glz-{self.region}-1.{self.shard}.a.pvp.net/parties/v1/parties/{partyId}"

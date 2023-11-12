@@ -1,8 +1,6 @@
-from .alternative import set_solver, solver
-from .struct import CaptchaSolver
-from .web import WebServerSolver
+from .ServerSolve import ServerCaptcha
+
 
 __all__ = [
-    "CaptchaSolver", "WebServerSolver",
-    "set_solver", "solver"
+    "ServerCaptcha"
 ]
